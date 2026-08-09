@@ -1,0 +1,11 @@
+{
+  "name": "high-council-of-magic",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:songs": "node scripts/build-song-catalog.mjs"
+  },
+  "dependencies": {
+    "sharp": "0.35.3"
+  }
+}
