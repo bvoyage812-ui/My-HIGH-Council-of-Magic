@@ -124,22 +124,27 @@ function renderReceivedBox(latestEvent) {
   }, 10000);
 }
 
-// Track when this page session started to ignore old historical hugs
-const sessionStartTime = Date.now();
+// Keep track of the last seen hug timestamp to prevent re-triggering old events
+let lastSeenHugTime = Date.now();
 
 // Listens only for incoming hugs sent TO this person from their partner
 const receivedQuery = query(collection(db, "hugEvents"), where("to", "==", MY_ID));
 onSnapshot(receivedQuery, (snap) => {
   let latest = null;
+  
   snap.forEach((docSnap) => {
     const data = docSnap.data();
-    // Only process if it arrived after page load AND wasn't sent by yourself
-    if (data.sentAt > sessionStartTime && data.from !== MY_ID) {
-      if (!latest || data.sentAt > latest.sentAt) latest = data;
+    // Make sure it wasn't sent by you, and check against the latest timestamp
+    if (data.from !== MY_ID) {
+      if (!latest || data.sentAt > latest.sentAt) {
+        latest = data;
+      }
     }
   });
 
-  if (latest) {
+  // If a valid incoming hug exists and it's newer than what we've handled this session
+  if (latest && latest.sentAt > lastSeenHugTime) {
+    lastSeenHugTime = latest.sentAt;
     renderReceivedBox(latest);
   }
 });
