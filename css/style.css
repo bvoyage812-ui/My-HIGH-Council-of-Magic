@@ -1,0 +1,99 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+/* The Split Container */
+.container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Each Side */
+.side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    color: white;
+    text-align: center;
+}
+
+.left {
+    background-color: #ff9aa2;
+}
+
+.right {
+    background-color: #a2d2ff;
+}
+
+/* The Center Bridge */
+.bridge {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+/* Text & Buttons */
+h1 {
+    margin-bottom: 10px;
+    font-size: 2rem;
+}
+
+.timer {
+    color: #333;
+    font-size: 1.2rem;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.subtext {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    display: inline-block;
+    border-radius: 20px;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.2s;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+}
+
+.enter-btn {
+    background: #333;
+    color: white;
+}

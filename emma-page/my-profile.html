@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Emma's personal corner of Our Digital Sanctuary.">
+    <title>Emma's Sanctuary</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <aside class="music-player" aria-label="Music player">
+        <audio id="audio-player" preload="metadata"></audio>
+        <div class="player-heading">
+            <div class="player-art" aria-hidden="true">
+                <img id="cover-art" alt="" hidden>
+                <span id="cover-fallback">&#9835;</span>
+            </div>
+            <div>
+                <p class="player-label">Now playing</p>
+                <p class="track-name" id="track-name">
+                    <span id="track-title-text">Finding songs...</span>
+                </p>
+            </div>
+        </div>
+        <div class="player-controls">
+            <button id="previous-track" type="button" aria-label="Previous song" disabled>&#10094;</button>
+            <button class="play-button" id="toggle-play" type="button" aria-label="Play" disabled>&#9654;</button>
+            <button id="next-track" type="button" aria-label="Next song" disabled>&#10095;</button>
+        </div>
+        <div class="volume-control">
+            <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.05" aria-label="Volume">
+            <output id="volume-value" for="volume-slider">5%</output>
+        </div>
+        <p class="track-count" id="track-count" aria-live="polite"></p>
+    </aside>
+
+    <div class="ambient-glow" aria-hidden="true"></div>
+
+    <header class="page-header">
+        <a class="back-link" href="../index.html" aria-label="Return to Our Digital Sanctuary">
+            <span aria-hidden="true">&#8592;</span> Our Sanctuary
+        </a>
+        <p class="chapter-mark">A page from our little diary</p>
+    </header>
+
+    <main>
+        <section class="welcome" aria-labelledby="welcome-title">
+            <p class="eyebrow">Yours truly</p>
+            <h1 id="welcome-title">IMONG UYAB</h1>
+            <p class="welcome-copy">
+                A cool idea we had together, welcome to my side of it :D
+            </p>
+
+            <figure class="portrait-bubble">
+                <img
+                    src="assets/pictures/evil_wizard.jpeg"
+                    alt="Portrait of the evil wizard"
+                >
+            </figure>
+        </section>
+
+        <section class="journal-card introduction" aria-labelledby="introduction-title">
+            <div class="section-number" aria-hidden="true">I</div>
+            <div class="section-content">
+                <p class="section-kicker">An introduction</p>
+                <h2 id="introduction-title">A Few Words From Me</h2>
+                <p class="placeholder-copy">Give me chocky milk and cookies and I'll do magic for you.</p>
+            </div>
+        </section>
+
+        <section class="journal-card about" aria-labelledby="about-title">
+            <div class="section-number" aria-hidden="true">II</div>
+            <div class="section-content">
+                <p class="section-kicker">Behind the magic</p>
+                <h2 id="about-title">About Me</h2>
+                <p class="placeholder-copy">Powered by magic, coffee and a dash of mischief, my resolution is to create such a powerful arcana so I can finally turn into a robot.</p>
+            </div>
+        </section>
+
+        <section class="partner-section" aria-labelledby="partner-title">
+            <p class="section-kicker">The heart of this page</p>
+            <h2 id="partner-title">What I Love About My Partner</h2>
+            <div class="blank-entry" aria-label="A note about my partner">
+                <div class="love-note">
+                    <p class="love-note-lead">SHE. IS. THE. BEST.</p>
+                    <p class="love-note-body">I wish the correct words could be found to describe how much I love her. She is my everything, my partner in spellcraft, my best friend, and the love of my life. Every moment spent with her is a treasure, and I am grateful for every laugh, every virtual hug, and every shared dream. She makes my world brighter and my heart fuller. I love her more than words can express.</p>
+                    <div class="love-list-section">
+                        <p class="love-list-title">Everything I Love About Her</p>
+                        <ul class="love-list">
+                            <li>Her smile</li>
+                            <li>Her laugh</li>
+                            <li>Her eyes</li>
+                            <li>Her voice</li>
+                            <li>Her kindness</li>
+                            <li>Her sense of humor</li>
+                            <li>Her tastes</li>
+                            <li>Her skills</li>
+                            <li>Her creativity</li>
+                            <li>Her intelligence</li>
+                            <li>Her imagination</li>
+                            <li>Her confidence</li>
+                            <li>Her honesty</li>
+                            <li>Her patience</li>
+                            <li>Her passion</li>
+                            <li>Her determination</li>
+                            <li>Her little habits</li>
+                            <li>Her beautiful weirdness</li>
+                            <li>Her way of caring</li>
+                            <li>Her warmth</li>
+                            <li>Her messages</li>
+                            <li>Her dreams</li>
+                            <li>Her beautiful heart</li>
+                            <li>Her boyfriend</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p class="everything-declaration">EVERYTHING!!!</p>
+        </section>
+       <!-- SEND SOME LOVE SECTION -->
+        <section class="journal-card love-section" aria-labelledby="love-btn-title">
+            <div class="section-number" aria-hidden="true">&#9829;</div>
+            <div class="section-content" style="width: 100%;">
+                <p class="section-kicker">Interactive</p>
+                <h2 id="love-btn-title">Send Some Love</h2>
+                <div class="love-action-container">
+                    <button id="hug-btn" class="clear-btn" type="button">
+                        <span id="hug-btn-label">Send a Virtual Hug</span> (<span id="hug-count">0</span>)
+                    </button>
+                    <div id="hug-received-box" class="hug-received-box">No hugs received yet</div>
+                </div>
+                <div id="hug-streak"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <span aria-hidden="true">&#10022;</span>
+        <p>Made together, one memory at a time.</p>
+        <span aria-hidden="true">&#10022;</span>
+    </footer>
+
+<script src="assets/songs-data.js"></script>
+<script src="player.js"></script>
+<script>window.HUG_ROLE = "partner_b";</script>
+<script type="module" src="/firebase-inits.js"></script>
+<script type="module" src="/hug-system.js"></script>
+
+</body>
+</html>
