@@ -254,18 +254,6 @@ if (document.readyState === 'loading') {
     setupStickerDragging();
 }
 
-var hugBtn = document.getElementById('hug-btn');
-var hugCountEl = document.getElementById('hug-count');
-var hugCount = 0;
-
-if (hugBtn && hugCountEl) {
-    hugBtn.addEventListener('click', () => {
-        hugCount++;
-        hugCountEl.textContent = hugCount;
-        launchHug(hugBtn);
-    });
-}
-
 function launchHug(btn) {
     const rect = btn.getBoundingClientRect();
     const startX = rect.left + rect.width / 2;
@@ -372,3 +360,25 @@ window.addEventListener('DOMContentLoaded', (event) => {
         });
     });
 });
+
+function launchIncomingHug() {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const startX = window.innerWidth + 120; // starts just off the right edge
+    const startY = centerY;
+
+    const hug = document.createElement('div');
+    hug.className = 'flying-hug-incoming';
+    hug.innerHTML = `
+        <svg viewBox="0 0 32 29" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 29 C16 29 0 18.5 0 8.8 C0 3.4 4 0 8.3 0 C11.4 0 14 1.7 16 4.6 C18 1.7 20.6 0 23.7 0 C28 0 32 3.4 32 8.8 C32 18.5 16 29 16 29 Z" fill="#be0b0b"/>
+        </svg>
+    `;
+    hug.style.left = startX + 'px';
+    hug.style.top = startY + 'px';
+    hug.style.setProperty('--center-x', (centerX - startX) + 'px');
+    hug.style.setProperty('--center-y', (centerY - startY) + 'px');
+
+    document.body.appendChild(hug);
+    hug.addEventListener('animationend', () => hug.remove());
+}

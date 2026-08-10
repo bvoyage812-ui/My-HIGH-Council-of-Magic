@@ -127,6 +127,10 @@ function renderReceivedBox(latestEvent) {
 // Track when this page session started to ignore old historical hugs
 const sessionStartTime = Date.now();
 
+// Track the most recent incoming hug we've already reacted to, so a
+// snapshot re-fire doesn't replay the animation for the same hug twice.
+let lastAnimatedHugTime = null;
+
 // Listens only for incoming hugs sent TO this person from their partner
 const receivedQuery = query(collection(db, "hugEvents"), where("to", "==", MY_ID));
 onSnapshot(receivedQuery, (snap) => {
@@ -140,7 +144,19 @@ onSnapshot(receivedQuery, (snap) => {
   });
 
   if (latest) {
-    renderReceivedBox(latest);
+    // Only schedule once per genuinely new incoming hug
+    if (latest.sentAt !== lastAnimatedHugTime) {
+      lastAnimatedHugTime = latest.sentAt;
+
+      // Wait at least 3 seconds before showing the box + playing the animation
+      setTimeout(() => {
+        renderReceivedBox(latest);
+
+        if (typeof launchIncomingHug === "function") {
+          launchIncomingHug();
+        }
+      }, 3000);
+    }
   }
 });
 
@@ -193,8 +209,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (typeof triggerHugAnimation === "function") {
-      triggerHugAnimation();
+    if (typeof launchHug === "function") {
+      launchHug(btn);
     }
   });
 });

@@ -800,3 +800,168 @@ body.profile-page::after {
     50% { transform: scale(1.06); }
     100% { transform: scale(1); }
 }
+
+.music-player {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: 100%;
+    padding: 14px 28px;
+    background: linear-gradient(to right, #f6f9ef, #dcefd1);
+    border-bottom: 3px solid #6b9b5e;
+    box-sizing: border-box;
+}
+
+.player-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.player-art {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #cde3bd;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#cover-fallback {
+    color: #6b9b5e;
+    font-size: 1.4rem;
+}
+
+.player-label {
+    margin: 0 0 2px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4a7a3d;
+}
+
+.track-name {
+    margin: 0;
+    font-size: 1rem;
+    color: #2f4a26;
+    max-width: 220px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.player-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+}
+
+.player-controls button {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid #6b9b5e;
+    background: transparent;
+    color: #4a7a3d;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-controls button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.play-button {
+    width: 52px;
+    height: 52px;
+    background: #1f3d17;
+    color: #fff;
+    border: none;
+    font-size: 1.2rem;
+}
+
+.player-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.volume-control input[type="range"] {
+    accent-color: #4a7a3d;
+    width: 140px;
+}
+
+.volume-control output {
+    color: #4a7a3d;
+    font-size: 0.85rem;
+    min-width: 32px;
+}
+
+.track-count {
+    margin: 0;
+    color: #4a7a3d;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+/* Incoming Hug Animation — arrives from the right, pops at center */
+.flying-hug-incoming {
+    position: fixed;
+    width: 44px;
+    height: 44px;
+    pointer-events: none;
+    z-index: 10001;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+    animation: hugArrival 1.3s cubic-bezier(0.34, 1.1, 0.64, 1) forwards;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+}
+
+.flying-hug-incoming svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+@keyframes hugArrival {
+    0% {
+        transform: translate(-50%, -50%) scale(0.3);
+        opacity: 0;
+    }
+    55% {
+        transform: translate(calc(-50% + var(--center-x)), calc(-50% + var(--center-y))) scale(1.15);
+        opacity: 1;
+    }
+    72% {
+        transform: translate(calc(-50% + var(--center-x)), calc(-50% + var(--center-y))) scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-50% + var(--center-x)), calc(-50% + var(--center-y))) scale(0);
+        opacity: 0;
+    }
+}

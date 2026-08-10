@@ -26,6 +26,36 @@
 </head>
  
 <body class="profile-page">
+
+  <!-- ============================================= -->
+  <!-- MUSIC PLAYER (brought over from the other file) -->
+  <!-- ============================================= -->
+  <aside class="music-player" aria-label="Music player">
+      <audio id="audio-player" preload="metadata"></audio>
+      <div class="player-heading">
+          <div class="player-art" aria-hidden="true">
+              <img id="cover-art" alt="" hidden>
+              <span id="cover-fallback">&#9835;</span>
+          </div>
+          <div>
+              <p class="player-label">Now playing</p>
+              <p class="track-name" id="track-name">
+                  <span id="track-title-text">Finding songs...</span>
+              </p>
+          </div>
+      </div>
+      <div class="player-controls">
+          <button id="previous-track" type="button" aria-label="Previous song" disabled>&#10094;</button>
+          <button class="play-button" id="toggle-play" type="button" aria-label="Play" disabled>&#9654;</button>
+          <button id="next-track" type="button" aria-label="Next song" disabled>&#10095;</button>
+      </div>
+      <div class="volume-control">
+          <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.05" aria-label="Volume">
+          <output id="volume-value" for="volume-slider">5%</output>
+      </div>
+      <p class="track-count" id="track-count" aria-live="polite"></p>
+  </aside>
+
   <div class="magic-pulse-overlay" aria-hidden="true"></div>
   <div class="flower-background" aria-hidden="true">
     <span class="flower flower1">🌸</span>
@@ -45,7 +75,7 @@
                 <div class="section-title">WELCOME!</div>
                 <div class="sticker-board">
                     <div class="sticker-area" id="sticker-area">
-                        <img src="/pictures/heart.png" class="sticker" alt="Sticker">
+                        <img src="/nin-page/assets/pictures/heart.png" class="sticker" alt="Sticker">
                     </div>
                 </div>
     <!-- Outer Wrapper for Side Polaroids and Main Card -->
@@ -58,15 +88,15 @@
             <!-- 1. LEFT SIDE POLAROID                      -->
             <!-- ========================================== -->
             <div class="polaroid-stack tilt-left">
-                <div class="polaroid-card" data-preview-src="/pictures/amor.jpg" data-preview-alt="Memory 1">
-                    <img src="/pictures/1st-date.jpg" alt="Memory 1" class="polaroid-img">
+                <div class="polaroid-card" data-preview-src="/nin-page/assets/pictures/amor.jpg" data-preview-alt="Memory 1">
+                    <img src="/nin-page/assets/pictures/1st-date.jpg" alt="Memory 1" class="polaroid-img">
                     <p class="polaroid-caption">First Date</p>
                 </div>
                 <div class="mini-photo-slot">
-                    <img src="/pictures/bigotto.jpg" alt="Add photo" class="mini-photo-img">
+                    <img src="/nin-page/assets/pictures/bigotto.jpg" alt="Add photo" class="mini-photo-img">
                 </div>
                 <div class="mini-photo-slot">
-                    <img src="/pictures/Screenshot 2026-07-27 020403.png" alt="Add photo" class="mini-photo-img">
+                    <img src="/nin-page/assets/pictures/Screenshot 2026-07-27 020403.png" alt="Add photo" class="mini-photo-img">
                 </div>
             </div>
  
@@ -84,7 +114,7 @@
  
                 <!-- Profile Main Content -->
                 <div class="profile-photo-frame" tabindex="0" role="button" aria-label="Trigger magical profile pulse">
-                    <img src="/pictures/me.png" alt="Profile Picture" class="profile-img">
+                    <img src="/nin-page/assets/pictures/me.png" alt="Profile Picture" class="profile-img">
                 </div>
                 <h1>Churrita, Tu Hermosa Novia</h1>
                 <p class="profile-tagline">"We are not perfect, but we are enough. Love yourself just the way you are :&gt;"</p>
@@ -170,16 +200,12 @@
      <div class="partner-box" onclick="toggleBox(this)">
         <h3>His really cute dog named Otto</h3>
         <div class="partner-content">
-            <img src="/pictures/otter.png" alt="Otto the German Doggy" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; margin-top: 10px;">
+            <img src="/nin-page/assets/pictures/otter.png" alt="Otto the German Doggy" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; margin-top: 10px;">
         </div>
     </div>
  
 </div>
-                <!-- Background Music -->
-                <audio autoplay loop id="bg-music">
-                    <source src="/music/Blossom.mp" type="audio/mpeg">
-                </audio>
- 
+
                 <!-- Attached Drawing Note Section -->
                 <div class="section-title">LEAVE A DOODLE NOTE</div>
                 <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">Draw something cute for your partner right here!</p>
@@ -190,22 +216,19 @@
                         <div class="drawing-box">
                             <canvas id="draw-canvas"></canvas>
                         </div>
-                        
-                        <!-- Controls Toolbar (Undo, Clear, and Brush Size Slider) -->
+                    </div>
+                    </div><!-- Controls Toolbar (Undo, Clear, and Brush Size Slider) -->
                         <div style="margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
                             <div>
                                 <button class="clear-btn" id="undo-canvas" style="background-color: #a2d2ff; margin-right: 5px;">Undo</button>
                                 <button class="clear-btn" id="clear-canvas">Clear Note</button>
                             </div>
-                            
                             <!-- Brush Size Controller -->
                             <div style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #666;">
                                 <label for="brush-size">Pen Size:</label>
                                 <input type="range" id="brush-size" min="1" max="20" value="3" style="accent-color: #637391; cursor: pointer;">
                                 <span id="brush-size-val" style="width: 20px; text-align: left;">3px</span>
                             </div>
-                        </div>
-                    </div>
                 </div>
              
  
@@ -221,10 +244,8 @@
     <div id="hug-streak"></div>
 </div>
  
-
- 
-<!-- On HIS page — add this ONE line right above the two script tags above -->
-<script>window.HUG_ROLE = "partner_b";</script>
+<!-- NOTE: this page's HUG_ROLE — confirm this is correct for this page (was conflicting in the original: set to both "partner_b" and "partner_a") -->
+<script>window.HUG_ROLE = "partner_a";</script>
  
             </div> <!-- End of .profile-container -->
  
@@ -232,26 +253,29 @@
             <!-- 3. RIGHT SIDE POLAROID                     -->
             <!-- ========================================== -->
             <div class="polaroid-stack tilt-right">
-                <div class="polaroid-card" data-preview-src="/pictures/Desktop Screenshot 2026.07.23 - 02.37.16.57.png" data-preview-alt="Memory 2">
-                    <img src="/pictures/It Takes Two Screenshot 2026.06.25 - 00.18.17.19.png" alt="Memory 2" class="polaroid-img">
+                <div class="polaroid-card" data-preview-src="/nin-page/assets/pictures/Desktop Screenshot 2026.07.23 - 02.37.16.57.png" data-preview-alt="Memory 2">
+                    <img src="/nin-page/assets/pictures/It Takes Two Screenshot 2026.06.25 - 00.18.17.19.png" alt="Memory 2" class="polaroid-img">
                     <p class="polaroid-caption">Game Night</p>
                 </div>
                 <div class="mini-photo-slot">
-                    <img src="/pictures/Minecraft Screenshot 2026.05.21 - 04.14.49.38.png" alt="Add photo" class="mini-photo-img">
+                    <img src="/nin-page/assets/pictures/Minecraft Screenshot 2026.05.21 - 04.14.49.38.png" alt="Add photo" class="mini-photo-img">
                     <p class="polaroid-caption"></p>
                 </div>
                 <div class="mini-photo-slot">
-                    <img src="/pictures/otto.jpg" alt="Add photo" class="mini-photo-img">
+                    <img src="/nin-page/assets/pictures/otto.jpg" alt="Add photo" class="mini-photo-img">
                 </div>
             </div>
  
         </div> <!-- End of .profile-layout-row -->
  
     </div> <!-- End of .page-wrapper -->
- 
- <script src="/nin-page/nin.js"></script>
-<script>window.HUG_ROLE = "partner_a";</script>
-<script type="module" src="firebase-init.js"></script>
-<script type="module" src="hug-system.js"></script>
+
+    <!-- Music player scripts -->
+    <script src="/nin-page/assets/songs-data.js"></script>
+    <script src="/nin-page/player.js"></script>
+
+    <script src="/nin-page/nin.js"></script>
+ <script type="module" src="/firebase-init.js"></script>
+<script type="module" src="/hug-system.js"></script>
 </body>
 </html>
