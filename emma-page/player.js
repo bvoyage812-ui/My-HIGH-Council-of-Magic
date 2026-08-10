@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function launchIncomingHug() {
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
-    const startX = window.innerWidth + 120; // starts just off the right edge
+    const startX = -120; // starts just off the right edge
     const startY = centerY;
 
     const hug = document.createElement('div');
