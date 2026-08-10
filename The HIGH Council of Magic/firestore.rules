@@ -1,8 +1,0 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /hugs/{doc} { allow read, write: if true; }
-    match /tokens/{doc} { allow read, write: if true; }
-    match /hugEvents/{doc} { allow read, write: if true; }
-  }
-}
