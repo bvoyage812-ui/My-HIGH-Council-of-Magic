@@ -8,25 +8,25 @@
 </head>
 <body>
     <div class="container">
-        <!-- Nin's Side -->
-        <div class="side left" data-profile="nin">
-            <h1>Nin's World</h1>
+        <!-- Your Side -->
+        <div class="side left">
+            <h1>My World</h1>
             <p>"Life is better when we're playing together."</p>
-            <a href="nin-page/my-profile.html" class="btn profile-link">Nin's Profile</a>
+            <a href="nin-page/my-profile.html" class="btn">My Profile</a>
         </div>
 
         <!-- The Bridge -->
         <div class="bridge">
             <div class="timer" id="days-together" aria-live="polite">Loading...</div>
             <p class="subtext">Together</p>
-            <a href="bridge/bridge.html" class="btn enter-btn" id="bridge-link">ENTER</a>
+            <a href="home.html" class="btn enter-btn">ENTER</a>
         </div>
 
-        <!-- Emma's Side -->
-        <div class="side right" data-profile="emma">
-            <h1>Emma's World</h1>
+        <!-- His Side -->
+        <div class="side right">
+            <h1>His World</h1>
             <p>"My favorite player two for every game."</p>
-            <a href="emma-page/my-profile.html" class="btn profile-link">Emma's Profile</a>
+            <a href="emma-page/my-profile.html" class="btn">My Profile</a>
         </div>
     </div>
 
@@ -43,79 +43,6 @@
 
         updateDaysTogether();
         setInterval(updateDaysTogether, 60 * 1000);
-
-        const container = document.querySelector('.container');
-        const profileLinks = document.querySelectorAll('.profile-link');
-        const bridgeLink = document.getElementById('bridge-link');
-        const bridge = document.querySelector('.bridge');
-        let transitionInProgress = false;
-
-        profileLinks.forEach((link) => {
-            link.addEventListener('click', (event) => {
-                if (
-                    event.button !== 0
-                    || event.metaKey
-                    || event.ctrlKey
-                    || event.shiftKey
-                    || event.altKey
-                ) {
-                    return;
-                }
-
-                event.preventDefault();
-
-                if (transitionInProgress) {
-                    return;
-                }
-
-                transitionInProgress = true;
-
-                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                    window.location.assign(link.href);
-                    return;
-                }
-
-                const selectedSide = link.closest('.side');
-                container.classList.add('is-transitioning');
-                selectedSide.classList.add('is-selected');
-
-                window.setTimeout(() => {
-                    window.location.assign(link.href);
-                }, 760);
-            });
-        });
-
-        bridgeLink.addEventListener('click', (event) => {
-            if (
-                event.button !== 0
-                || event.metaKey
-                || event.ctrlKey
-                || event.shiftKey
-                || event.altKey
-            ) {
-                return;
-            }
-
-            event.preventDefault();
-
-            if (transitionInProgress) {
-                return;
-            }
-
-            transitionInProgress = true;
-
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                window.location.assign(bridgeLink.href);
-                return;
-            }
-
-            container.classList.add('is-bridge-transition');
-            bridge.classList.add('is-selected');
-
-            window.setTimeout(() => {
-                window.location.assign(bridgeLink.href);
-            }, 840);
-        });
     </script>
 </body>
 </html>
