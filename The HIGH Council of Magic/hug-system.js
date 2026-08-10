@@ -1,203 +1,178 @@
-// hug-system.js
-import { db, messaging, VAPID_KEY } from "/firebase-init.js";
+import { auth, db, googleProvider } from "./firebase-init.js";
 import {
-  doc, getDoc, setDoc, updateDoc, onSnapshot, increment,
-  collection, query, where
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getToken } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+  browserLocalPersistence,
+  onAuthStateChanged,
+  setPersistence,
+  signInWithPopup,
+  signOut,
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import {
+  doc,
+  onSnapshot,
+  runTransaction,
+  serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-// Which person is on this page. Leave window.HUG_ROLE unset on HER page
-// (it will default to partner_a). On HIS page, set window.HUG_ROLE =
-// "partner_b" in an inline <script> tag right before this file loads.
-const MY_ID = window.HUG_ROLE === "partner_b" ? "partner_b" : "partner_a";
-const PARTNER_ID = MY_ID === "partner_a" ? "partner_b" : "partner_a";
+const MY_ROLE = window.HUG_ROLE === "emma" ? "emma" : "nin";
+const PARTNER_ROLE = MY_ROLE === "nin" ? "emma" : "nin";
+const stateRef = doc(db, "hugs", "state");
 
-// TEMPORARY: set to true to bring the once-a-day limit back.
-const DAILY_LIMIT_ENABLED = false;
+const button = document.getElementById("hug-btn");
+const buttonLabel = document.getElementById("hug-btn-label");
+const totalCount = document.getElementById("hug-count");
+const receivedBox = document.getElementById("hug-received-box");
+const statusText = document.getElementById("hug-streak");
 
-const statusRef = doc(db, "hugs", "status");
-const counterRef = doc(db, "hugs", "counter");
-const tokenRef = doc(db, "tokens", MY_ID);
+let unsubscribeFromHugs = null;
+let previousReceived = null;
 
-function todayStr() {
-  const d = new Date();
-  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.warn("Could not save the sign-in session:", error);
+});
+
+function setStatus(message, isError = false) {
+  if (!statusText) return;
+  statusText.textContent = message;
+  statusText.classList.toggle("hug-error", isError);
 }
 
-function yesterdayStr() {
-  const d = new Date();
-  d.setUTCDate(d.getUTCDate() - 1);
-  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
-}
+function renderState(data = {}) {
+  const total = Number(data.total) || 0;
+  const received = Number(data[`${MY_ROLE}Received`]) || 0;
 
-// ---------- Register this device for push notifications ----------
-async function registerForPush() {
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") return;
+  if (totalCount) totalCount.textContent = String(total);
+  if (receivedBox) {
+    receivedBox.textContent = `You've received ${received} ${received === 1 ? "hug" : "hugs"}`;
+    receivedBox.classList.toggle("has-hug", received > 0);
+  }
 
-    const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
-    const token = await getToken(messaging, {
-      vapidKey: VAPID_KEY,
-      serviceWorkerRegistration: registration
-    });
-
-    if (token) {
-      await setDoc(tokenRef, { token, updatedAt: Date.now() });
+  if (previousReceived !== null && received > previousReceived) {
+    const newHugs = Math.min(received - previousReceived, 8);
+    for (let index = 0; index < newHugs; index += 1) {
+      window.setTimeout(() => launchHeart("incoming"), index * 180);
     }
-  } catch (err) {
-    console.warn("Push registration skipped:", err);
   }
+
+  previousReceived = received;
 }
 
-// ---------- Streak + counter display ----------
-function renderStreak(streak) {
-  const el = document.getElementById("hug-streak");
-  if (!el) return;
-  if (!streak || streak < 1) {
-    el.textContent = "No streak yet — send the first hug!";
-  } else {
-    el.textContent = `🔥 ${streak} day streak`;
-  }
+function stopListening() {
+  if (unsubscribeFromHugs) unsubscribeFromHugs();
+  unsubscribeFromHugs = null;
+  previousReceived = null;
 }
 
-function updateButtonState(lastHugDate) {
-  const btn = document.getElementById("hug-btn");
-  if (!btn) return;
-  const already = DAILY_LIMIT_ENABLED && lastHugDate === todayStr();
-  btn.disabled = already;
-  btn.style.opacity = already ? "0.6" : "1";
-  btn.style.cursor = already ? "not-allowed" : "pointer";
-
-  const label = document.getElementById("hug-btn-label");
-  if (label) {
-    label.textContent = already ? "Come back tomorrow 💤" : "Send a Virtual Hug";
-  }
+function startListening() {
+  stopListening();
+  unsubscribeFromHugs = onSnapshot(
+    stateRef,
+    (snapshot) => renderState(snapshot.exists() ? snapshot.data() : {}),
+    (error) => {
+      console.error("Could not listen for hugs:", error);
+      setStatus("The hugs could not be loaded. Check the Firestore rules.", true);
+    },
+  );
 }
 
-// Live-update UI whenever the shared status doc changes
-onSnapshot(statusRef, (snap) => {
-  const data = snap.data() || {};
-  renderStreak(data.streak || 0);
-  updateButtonState(data.lastHugDate || null);
-});
+function launchHeart(direction) {
+  if (!button) return;
 
-// Live-update the global counter badge
-onSnapshot(counterRef, (docSnap) => {
-  const hugCountSpan = document.getElementById("hug-count");
-  if (docSnap.exists() && hugCountSpan) {
-    hugCountSpan.textContent = docSnap.data().total || 0;
-  }
-});
+  const buttonRect = button.getBoundingClientRect();
+  const buttonX = buttonRect.left + buttonRect.width / 2;
+  const buttonY = buttonRect.top + buttonRect.height / 2;
+  const partnerEdgeX = MY_ROLE === "nin" ? window.innerWidth + 70 : -70;
+  const isIncoming = direction === "incoming";
+  const startX = isIncoming ? partnerEdgeX : buttonX;
+  const startY = isIncoming ? window.innerHeight / 2 : buttonY;
+  const endX = isIncoming ? buttonX : partnerEdgeX;
+  const endY = isIncoming ? buttonY : window.innerHeight / 2;
+  const midX = (startX + endX) / 2;
+  const midY = Math.max(70, Math.min(startY, endY) - 110);
 
-// ---------- "You got a hug from him/her" box ----------
-function formatReceivedTime(ms) {
-  const diffMinutes = Math.round((Date.now() - ms) / 60000);
-  if (diffMinutes < 1) return "just now";
-  if (diffMinutes < 60) return `${diffMinutes} min ago`;
-  const diffHours = Math.round(diffMinutes / 60);
-  if (diffHours < 24) return `${diffHours} hr ago`;
-  const d = new Date(ms);
-  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const heart = document.createElement("div");
+  heart.className = `flying-hug ${isIncoming ? "is-incoming" : "is-outgoing"}`;
+  heart.textContent = "♥";
+  heart.setAttribute("aria-hidden", "true");
+  heart.style.left = `${startX}px`;
+  heart.style.top = `${startY}px`;
+  heart.style.setProperty("--mid-x", `${midX - startX}px`);
+  heart.style.setProperty("--mid-y", `${midY - startY}px`);
+  heart.style.setProperty("--end-x", `${endX - startX}px`);
+  heart.style.setProperty("--end-y", `${endY - startY}px`);
+  document.body.appendChild(heart);
+  heart.addEventListener("animationend", () => heart.remove(), { once: true });
 }
 
-let hideTimeout = null;
-
-function renderReceivedBox(latestEvent) {
-  const box = document.getElementById("hug-received-box");
-  if (!box) return;
-
-  if (!latestEvent) {
-    box.textContent = "No hugs received yet";
-    box.classList.remove("has-hug");
-    return;
-  }
-
-  box.textContent = `🤗 You got a hug ${formatReceivedTime(latestEvent.sentAt)}`;
-  box.classList.add("has-hug");
-
-  // Reset timer so it hides cleanly after 10 seconds
-  if (hideTimeout) clearTimeout(hideTimeout);
-  hideTimeout = setTimeout(() => {
-    box.textContent = "No hugs received yet";
-    box.classList.remove("has-hug");
-  }, 10000);
+async function signIn() {
+  if (auth.currentUser) return auth.currentUser;
+  setStatus("Opening Google sign-in...");
+  const result = await signInWithPopup(auth, googleProvider);
+  return result.user;
 }
 
-// Keep track of the last seen hug timestamp to prevent re-triggering old events
-let lastSeenHugTime = Date.now();
-
-// Listens only for incoming hugs sent TO this person from their partner
-const receivedQuery = query(collection(db, "hugEvents"), where("to", "==", MY_ID));
-onSnapshot(receivedQuery, (snap) => {
-  let latest = null;
-  
-  snap.forEach((docSnap) => {
-    const data = docSnap.data();
-    // Make sure it wasn't sent by you, and check against the latest timestamp
-    if (data.from !== MY_ID) {
-      if (!latest || data.sentAt > latest.sentAt) {
-        latest = data;
-      }
-    }
-  });
-
-  // If a valid incoming hug exists and it's newer than what we've handled this session
-  if (latest && latest.sentAt > lastSeenHugTime) {
-    lastSeenHugTime = latest.sentAt;
-    renderReceivedBox(latest);
-  }
-});
-
-// ---------- Sending a hug (limit + streak + counter logic lives here) ----------
 async function sendHug() {
-  const snap = await getDoc(statusRef);
-  const data = snap.exists() ? snap.data() : {};
-  const today = todayStr();
+  await signIn();
 
-  if (DAILY_LIMIT_ENABLED && data.lastHugDate === today) {
-    return false; // already used today's hug
-  }
+  await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(stateRef);
+    const state = snapshot.exists() ? snapshot.data() : {};
+    const ninReceived = Number(state.ninReceived) || 0;
+    const emmaReceived = Number(state.emmaReceived) || 0;
 
-  let newStreak = 1;
-  if (data.lastHugDate === yesterdayStr()) {
-    newStreak = (data.streak || 0) + 1;
-  }
-
-  await setDoc(statusRef, {
-    lastHugDate: today,
-    streak: newStreak,
-    lastSender: MY_ID
-  }, { merge: true });
-
-  await setDoc(counterRef, { total: increment(1) }, { merge: true });
-
-  const now = Date.now();
-  await setDoc(doc(db, "hugEvents", `${MY_ID}_${now}`), {
-    from: MY_ID,
-    to: PARTNER_ID,
-    sentAt: now
+    transaction.set(stateRef, {
+      total: (Number(state.total) || 0) + 1,
+      ninReceived: ninReceived + (PARTNER_ROLE === "nin" ? 1 : 0),
+      emmaReceived: emmaReceived + (PARTNER_ROLE === "emma" ? 1 : 0),
+      lastSender: MY_ROLE,
+      updatedAt: serverTimestamp(),
+    });
   });
 
-  return true;
+  launchHeart("outgoing");
 }
 
-// ---------- Wire up the existing button ----------
-document.addEventListener("DOMContentLoaded", () => {
-  registerForPush();
+onAuthStateChanged(auth, (user) => {
+  if (!button) return;
 
-  const btn = document.getElementById("hug-btn");
-  if (!btn) return;
+  if (user) {
+    button.disabled = false;
+    setStatus("Connected — hugs update in real time.");
+    startListening();
+  } else {
+    stopListening();
+    button.disabled = false;
+    if (totalCount) totalCount.textContent = "—";
+    if (receivedBox) receivedBox.textContent = "Sign in to see your hugs";
+    setStatus("Google sign-in will open when you send your first hug.");
+  }
+});
 
-  btn.addEventListener("click", async (e) => {
-    const allowed = await sendHug();
-    if (!allowed) {
-      e.stopImmediatePropagation();
-      return;
-    }
+if (button) {
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    if (buttonLabel) buttonLabel.textContent = "Sending...";
 
-    if (typeof triggerHugAnimation === "function") {
-      triggerHugAnimation();
+    try {
+      await sendHug();
+      setStatus("Hug sent! ♥");
+    } catch (error) {
+      console.error("Could not send the hug:", error);
+      const permissionDenied = error?.code === "permission-denied"
+        || error?.code === "firestore/permission-denied";
+
+      if (permissionDenied) {
+        await signOut(auth).catch(() => {});
+      }
+
+      const message = error?.code === "auth/popup-closed-by-user"
+        ? "Sign-in was cancelled. No hug was sent."
+        : permissionDenied
+          ? "This account is not authorized for this side. Choose the other Google account."
+          : "The hug could not be sent. Check your connection and try again.";
+      setStatus(message, true);
+    } finally {
+      button.disabled = false;
+      if (buttonLabel) buttonLabel.textContent = "Send a Virtual Hug";
     }
   });
-});
+}

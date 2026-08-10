@@ -643,6 +643,12 @@ footer span {
     font-family: Georgia, "Times New Roman", serif;
     font-size: 0.9rem;
     font-style: italic;
+    transition: border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.hug-received-box.has-hug {
+    border-color: var(--crimson-bright);
+    color: var(--ivory);
 }
 
 #hug-streak {
@@ -651,6 +657,10 @@ footer span {
     font-family: Georgia, "Times New Roman", serif;
     font-size: 0.85rem;
     font-style: italic;
+}
+
+#hug-streak.hug-error {
+    color: #e6a1ad;
 }
 
 @media (max-width: 850px) {
@@ -670,18 +680,15 @@ footer span {
     width: 40px;
     height: 40px;
     pointer-events: none;
-    z-index: 1;              /* starts behind the button */
+    z-index: 10001;
     left: 0;
     top: 0;
     transform: translate(-50%, -50%) scale(0);
     animation: hugJourney 1.6s cubic-bezier(0.34, 1.1, 0.64, 1) forwards;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
-}
-
-.flying-hug svg {
-    width: 100%;
-    height: 100%;
-    display: block;
+    color: var(--crimson-bright);
+    font: 700 42px/1 Georgia, "Times New Roman", serif;
+    text-align: center;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35));
 }
 
 @keyframes hugJourney {

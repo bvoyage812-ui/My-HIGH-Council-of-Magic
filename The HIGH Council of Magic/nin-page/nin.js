@@ -7,12 +7,12 @@ const brushSizeVal = document.getElementById('brush-size-val');
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
-let history = []; 
-let currentLineWidth = 3; 
+let history = [];
+let currentLineWidth = 3;
 
 // Initialize brush style
-ctx.strokeStyle = '#2e7d32'; 
-ctx.lineCap = 'round';      
+ctx.strokeStyle = '#2e7d32';
+ctx.lineCap = 'round';
 ctx.lineJoin = 'round';
 ctx.lineWidth = currentLineWidth;
 
@@ -47,10 +47,10 @@ function resizeCanvas() {
 
     canvas.width = rect.width;
     canvas.height = rect.height;
-    
-    ctx.strokeStyle = '#2e7d32'; 
-    ctx.lineWidth = currentLineWidth;      
-    ctx.lineCap = 'round';      
+
+    ctx.strokeStyle = '#2e7d32';
+    ctx.lineWidth = currentLineWidth;
+    ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
     // Restore drawing instantly so it doesn't disappear when resetting size
@@ -92,9 +92,9 @@ window.addEventListener('load', () => {
     const rect = container ? container.getBoundingClientRect() : { width: 400, height: 300 };
     canvas.width = rect.width;
     canvas.height = rect.height;
-    ctx.strokeStyle = '#2e7d32'; 
-    ctx.lineWidth = currentLineWidth;          
-    ctx.lineCap = 'round';      
+    ctx.strokeStyle = '#2e7d32';
+    ctx.lineWidth = currentLineWidth;
+    ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
     const saved = localStorage.getItem('userDoodle');
@@ -109,7 +109,6 @@ window.addEventListener('load', () => {
         };
     }
 });
-
 function getPosition(e) {
     const rect = canvas.getBoundingClientRect();
     const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
@@ -128,9 +127,9 @@ function startDrawing(e) {
 
 function draw(e) {
     if (!isDrawing) return;
-    
+
     // Only prevent default behavior when actively drawing strokes with the mouse pressed down
-    e.preventDefault(); 
+    e.preventDefault();
 
     const [currentX, currentY] = getPosition(e);
 
@@ -145,7 +144,7 @@ function draw(e) {
 function stopDrawing() {
     if (!isDrawing) return;
     isDrawing = false;
-    saveState(); 
+    saveState();
 }
 
 if (canvas) {
@@ -163,7 +162,7 @@ const undoBtn = document.getElementById('undo-canvas');
 if (undoBtn) {
     undoBtn.addEventListener('click', () => {
         if (history.length > 1) {
-            history.pop(); 
+            history.pop();
             let img = new Image();
             img.src = history[history.length - 1];
             img.onload = () => {
@@ -183,7 +182,7 @@ const clearBtn = document.getElementById('clear-canvas');
 if (clearBtn) {
     clearBtn.addEventListener('click', () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        history = []; 
+        history = [];
         localStorage.removeItem('userDoodle');
         localStorage.removeItem('doodleWidth');
         localStorage.removeItem('doodleHeight');
@@ -192,10 +191,10 @@ if (clearBtn) {
 
 function setupStickerDragging() {
     const stickers = document.querySelectorAll('.sticker');
-    
+
     stickers.forEach((sticker, index) => {
         sticker.style.position = 'absolute';
-        
+
         if (!sticker.style.left || sticker.style.left === '') {
             sticker.style.left = `${100 + (index * 120)}px`;
         }
@@ -225,7 +224,7 @@ function setupStickerDragging() {
                 const parentRect = sticker.offsetParent?.getBoundingClientRect() || { left: 0, top: 0 };
                 const currentX = moveEvent.clientX - clickOffsetX - parentRect.left;
                 const currentY = moveEvent.clientY - clickOffsetY - parentRect.top;
-                
+
                 sticker.style.left = `${currentX}px`;
                 sticker.style.top = `${currentY}px`;
             };
@@ -235,7 +234,7 @@ function setupStickerDragging() {
                 try {
                     sticker.releasePointerCapture(upEvent.pointerId);
                 } catch (e) {}
-                
+
                 window.removeEventListener('pointermove', moveHandler);
                 window.removeEventListener('pointerup', endHandler);
                 window.removeEventListener('pointercancel', endHandler);
@@ -254,40 +253,7 @@ if (document.readyState === 'loading') {
     setupStickerDragging();
 }
 
-function launchHug(btn) {
-    const rect = btn.getBoundingClientRect();
-    const startX = rect.left + rect.width / 2;
-    const startY = rect.top + rect.height / 2;
-
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    const endX = window.innerWidth + 120;
-    const endY = centerY;
-
-    const hug = document.createElement('div');
-    hug.className = 'flying-hug';
-    hug.innerHTML = `
-        <svg viewBox="0 0 32 29" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16 29 C16 29 0 18.5 0 8.8 C0 3.4 4 0 8.3 0 C11.4 0 14 1.7 16 4.6 C18 1.7 20.6 0 23.7 0 C28 0 32 3.4 32 8.8 C32 18.5 16 29 16 29 Z" fill="#be0b0b"/>
-        </svg>
-    `;
-    hug.style.left = startX + 'px';
-    hug.style.top = startY + 'px';
-    hug.style.setProperty('--mid-x', (centerX - startX) + 'px');
-    hug.style.setProperty('--mid-y', (centerY - startY) + 'px');
-    hug.style.setProperty('--end-x', (endX - startX) + 'px');
-    hug.style.setProperty('--end-y', (endY - startY) + 'px');
-
-    document.body.appendChild(hug);
-
-    setTimeout(() => {
-        hug.style.zIndex = '10001';
-    }, 280); 
-
-    hug.addEventListener('animationend', () => hug.remove());
-}
-
-function clickedBox(element) {} 
+function clickedBox(element) {}
 
 function toggleBox(boxElement) {
     boxElement.classList.toggle('expanded');
@@ -295,13 +261,13 @@ function toggleBox(boxElement) {
 
 document.addEventListener("DOMContentLoaded", () => {
     const targets = document.querySelectorAll('.partner-box h3, .partner-content, .partner-content p, .partner-content li');
-    
+
     targets.forEach(el => {
         function wrapWords(node) {
             if (node.nodeType === Node.TEXT_NODE) {
-                const words = node.textContent.split(/(\s+)/); 
+                const words = node.textContent.split(/(\s+)/);
                 const fragment = document.createDocumentFragment();
-                
+
                 words.forEach(word => {
                     if (word.trim() === "") {
                         fragment.appendChild(document.createTextNode(word));
@@ -316,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 node.childNodes.forEach(child => wrapWords(child));
             }
         }
-        
+
         el.childNodes.forEach(child => wrapWords(child));
     });
 });
@@ -360,25 +326,3 @@ window.addEventListener('DOMContentLoaded', (event) => {
         });
     });
 });
-
-function launchIncomingHug() {
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    const startX = window.innerWidth + 120; // starts just off the right edge
-    const startY = centerY;
-
-    const hug = document.createElement('div');
-    hug.className = 'flying-hug-incoming';
-    hug.innerHTML = `
-        <svg viewBox="0 0 32 29" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16 29 C16 29 0 18.5 0 8.8 C0 3.4 4 0 8.3 0 C11.4 0 14 1.7 16 4.6 C18 1.7 20.6 0 23.7 0 C28 0 32 3.4 32 8.8 C32 18.5 16 29 16 29 Z" fill="#be0b0b"/>
-        </svg>
-    `;
-    hug.style.left = startX + 'px';
-    hug.style.top = startY + 'px';
-    hug.style.setProperty('--center-x', (centerX - startX) + 'px');
-    hug.style.setProperty('--center-y', (centerY - startY) + 'px');
-
-    document.body.appendChild(hug);
-    hug.addEventListener('animationend', () => hug.remove());
-}

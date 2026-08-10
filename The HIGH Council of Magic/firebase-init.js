@@ -1,27 +1,24 @@
-// Import the functions you need from the SDKs you need
-// Import from CDN URLs directly so the browser can resolve them
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getMessaging } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
-// Your web app's Firebase configuration
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDFQffgGNgBWBEKQjyIz785RyZkmaeU02A",
-  authDomain: "the-high-council-of-magic.firebaseapp.com",
-  projectId: "the-high-council-of-magic",
-  storageBucket: "the-high-council-of-magic.firebasestorage.app",
-  messagingSenderId: "424950697983",
-  appId: "1:424950697983:web:ca63a19d88a53dffab61ca",
-  measurementId: "G-M7C7Z4XMFF"
+  apiKey: "AIzaSyCmMDEiz19xrERkTlpzIlmgqyvFGx2_wXU",
+  authDomain: "thcom-19588.firebaseapp.com",
+  projectId: "thcom-19588",
+  storageBucket: "thcom-19588.firebasestorage.app",
+  messagingSenderId: "449792294690",
+  appId: "1:449792294690:web:440c21509d56d70b35af7b",
+  measurementId: "G-XNZY02WM7Z",
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
 
-// Initialize and export the services your app expects
-export const db = getFirestore(app);
-export const messaging = getMessaging(app);
-
-// Add your Web Push VAPID key here if you use push notifications
-export const VAPID_KEY = "BCvjdsAGOjTsTLx2ejFrRSOlpk5b2CKLYyn50n94Go4X_ss3dpaTgDWbkDJQxuPuAu9zzjuZq7wQleHBOepJSHw";
+export { app, auth, db, googleProvider };
