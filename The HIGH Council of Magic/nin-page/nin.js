@@ -317,11 +317,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-//music volume control and profile photo pulse effect
+// Profile photo pulse effect
  window.addEventListener('DOMContentLoaded', (event) => {
-            var audio = document.getElementById('bg-music');
-            if(audio) audio.volume = 0.1;
-
             var frame = document.querySelector('.profile-photo-frame');
             var overlay = document.querySelector('.magic-pulse-overlay');
 

@@ -6,6 +6,14 @@
     font-family: 'Segoe UI', sans-serif;
 }
 
+:root {
+    --nin-green: #2e7d32;
+    --nin-green-dark: #174d21;
+    --emma-blue-gray: #838ea6;
+    --emma-blue-gray-dark: #4a556b;
+    --bridge-blend: #59866c;
+}
+
 html,
 body {
     height: 100%;
@@ -14,6 +22,7 @@ body {
 
 /* The Split Container */
 .container {
+    position: relative;
     display: flex;
     height: 100vh;
     width: 100vw;
@@ -21,22 +30,84 @@ body {
 
 /* Each Side */
 .side {
-    flex: 1;
+    position: relative;
+    flex: 0 0 50vw;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 50vw;
     padding: 40px;
     color: white;
     text-align: center;
+    overflow: hidden;
 }
 
 .left {
-    background-color: #ff9aa2;
+    background: linear-gradient(135deg, #4f9a5f, var(--nin-green-dark));
 }
 
 .right {
-    background-color: #a2d2ff;
+    background: linear-gradient(135deg, var(--emma-blue-gray), var(--emma-blue-gray-dark));
+}
+
+.side::before {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.15), transparent 45%);
+    content: "";
+    pointer-events: none;
+}
+
+.side > * {
+    position: relative;
+    z-index: 1;
+}
+
+.container.is-transitioning {
+    pointer-events: none;
+}
+
+.container.is-transitioning .side:not(.is-selected) {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 5;
+    width: 50vw;
+}
+
+.container.is-transitioning .left:not(.is-selected) {
+    left: 0;
+}
+
+.container.is-transitioning .right:not(.is-selected) {
+    right: 0;
+}
+
+.container.is-transitioning .bridge,
+.container.is-transitioning .side:not(.is-selected) > * {
+    animation: fadeAway 240ms ease forwards;
+}
+
+.side.is-selected {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 20;
+    width: 50vw;
+    animation: claimScreen 760ms cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+.side.left.is-selected {
+    left: 0;
+}
+
+.side.right.is-selected {
+    right: 0;
+}
+
+.side.is-selected > * {
+    animation: fadeAway 280ms ease forwards;
 }
 
 /* The Center Bridge */
@@ -47,7 +118,7 @@ body {
     transform: translate(-50%, -50%);
     width: 150px;
     height: 150px;
-    background: white;
+    background: var(--bridge-blend);
     border-radius: 50%;
     display: flex;
     flex-direction: column;
@@ -55,6 +126,24 @@ body {
     align-items: center;
     box-shadow: 0 0 20px rgba(0,0,0,0.2);
     z-index: 10;
+    overflow: hidden;
+}
+
+.container.is-bridge-transition {
+    pointer-events: none;
+}
+
+.container.is-bridge-transition .side > * {
+    animation: fadeAway 240ms ease forwards;
+}
+
+.bridge.is-selected {
+    z-index: 30;
+    animation: bridgeClaimScreen 840ms cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+.bridge.is-selected > * {
+    animation: fadeAway 260ms ease forwards;
 }
 
 /* Text & Buttons */
@@ -64,15 +153,17 @@ h1 {
 }
 
 .timer {
-    color: #333;
+    color: white;
     font-size: 1.2rem;
     font-weight: bold;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.32);
     white-space: nowrap;
 }
 
 .subtext {
-    color: #666;
+    color: rgba(255, 255, 255, 0.88);
     font-size: 0.8rem;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
 }
 
 .btn {
@@ -86,14 +177,53 @@ h1 {
     font-weight: bold;
     text-align: center;
     text-decoration: none;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .btn:hover {
     transform: scale(1.1);
+    box-shadow: 0 0.65rem 1.5rem rgba(0, 0, 0, 0.16);
 }
 
 .enter-btn {
     background: #333;
     color: white;
+}
+
+@keyframes claimScreen {
+    from {
+        width: 50vw;
+    }
+
+    to {
+        width: 100vw;
+    }
+}
+
+@keyframes fadeAway {
+    to {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+}
+
+@keyframes bridgeClaimScreen {
+    from {
+        width: 150px;
+        height: 150px;
+    }
+
+    to {
+        width: 150vmax;
+        height: 150vmax;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .side,
+    .side > *,
+    .bridge {
+        animation: none !important;
+        transition: none !important;
+    }
 }

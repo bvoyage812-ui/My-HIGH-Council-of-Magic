@@ -13,20 +13,20 @@ import sharp from 'sharp';
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = dirname(scriptDirectory);
-const emmaAssets = join(
-    repositoryRoot,
-    'The HIGH Council of Magic',
-    'emma-page',
-    'assets'
-);
-const songsDirectory = join(emmaAssets, 'songs');
-const coversDirectory = join(emmaAssets, 'pictures', 'covers');
-const catalogJsonPath = join(emmaAssets, 'songs.json');
-const catalogScriptPath = join(emmaAssets, 'songs-data.js');
+const websiteRoot = join(repositoryRoot, 'The HIGH Council of Magic');
+const catalogConfigurations = [
+    {
+        name: 'Emma',
+        assetsDirectory: join(websiteRoot, 'emma-page', 'assets'),
+        songsFolder: 'songs'
+    },
+    {
+        name: 'Nin',
+        assetsDirectory: join(websiteRoot, 'nin-page', 'assets'),
+        songsFolder: 'music'
+    }
+];
 const coverCropPerEdge = 110;
-
-mkdirSync(songsDirectory, { recursive: true });
-mkdirSync(coversDirectory, { recursive: true });
 
 function readSynchsafeInteger(bytes, offset) {
     return (bytes[offset] << 21)
@@ -252,52 +252,87 @@ async function cropCover(picture, trackName) {
         .toBuffer();
 }
 
-for (const fileName of readdirSync(coversDirectory)) {
-    if (/^auto-.*\.(png|jpe?g)$/i.test(fileName)) {
-        unlinkSync(join(coversDirectory, fileName));
+async function buildSongCatalog(configuration) {
+    const songsDirectory = join(
+        configuration.assetsDirectory,
+        configuration.songsFolder
+    );
+    const coversDirectory = join(
+        configuration.assetsDirectory,
+        'pictures',
+        'covers'
+    );
+    const catalogJsonPath = join(configuration.assetsDirectory, 'songs.json');
+    const catalogScriptPath = join(
+        configuration.assetsDirectory,
+        'songs-data.js'
+    );
+
+    mkdirSync(songsDirectory, { recursive: true });
+    mkdirSync(coversDirectory, { recursive: true });
+
+    for (const fileName of readdirSync(coversDirectory)) {
+        if (/^auto-.*\.(png|jpe?g)$/i.test(fileName)) {
+            unlinkSync(join(coversDirectory, fileName));
+        }
+    }
+
+    const songFiles = readdirSync(songsDirectory)
+        .filter(fileName => extname(fileName).toLowerCase() === '.mp3')
+        .sort((first, second) => first.localeCompare(second, 'en', { numeric: true }));
+
+    const catalog = [];
+
+    for (const fileName of songFiles) {
+        const fileBytes = readFileSync(join(songsDirectory, fileName));
+        const metadata = parseId3(fileBytes);
+        const fileStem = fileName.slice(0, -extname(fileName).length);
+        const hash = createHash('sha1').update(fileName).digest('hex').slice(0, 10);
+        const slug = slugify(fileStem) || 'track';
+        let cover = null;
+
+        if (metadata.picture) {
+            const coverFileName = `auto-${slug}-${hash}.png`;
+            const croppedCover = await cropCover(metadata.picture, fileName);
+            writeIfChanged(
+                join(coversDirectory, coverFileName),
+                croppedCover
+            );
+            cover = encodeAssetPath(
+                'assets',
+                'pictures',
+                'covers',
+                coverFileName
+            );
+        }
+
+        catalog.push({
+            title: metadata.title || fileStem,
+            artist: metadata.artist || null,
+            album: metadata.album || null,
+            file: encodeAssetPath(
+                'assets',
+                configuration.songsFolder,
+                fileName
+            ),
+            cover
+        });
+    }
+
+    const catalogJson = `${JSON.stringify(catalog, null, 2)}\n`;
+    const catalogScript = `window.SONG_CATALOG = ${catalogJson.replaceAll('<', '\\u003c')}`;
+
+    writeIfChanged(catalogJsonPath, Buffer.from(catalogJson));
+    writeIfChanged(catalogScriptPath, Buffer.from(catalogScript));
+
+    console.log(
+        `Generated ${configuration.name} song catalog with ${catalog.length} track(s).`
+    );
+    for (const track of catalog) {
+        console.log(`- ${track.title}${track.artist ? ` — ${track.artist}` : ''}`);
     }
 }
 
-const songFiles = readdirSync(songsDirectory)
-    .filter(fileName => extname(fileName).toLowerCase() === '.mp3')
-    .sort((first, second) => first.localeCompare(second, 'en', { numeric: true }));
-
-const catalog = [];
-
-for (const fileName of songFiles) {
-    const fileBytes = readFileSync(join(songsDirectory, fileName));
-    const metadata = parseId3(fileBytes);
-    const fileStem = fileName.slice(0, -extname(fileName).length);
-    const hash = createHash('sha1').update(fileName).digest('hex').slice(0, 10);
-    const slug = slugify(fileStem) || 'track';
-    let cover = null;
-
-    if (metadata.picture) {
-        const coverFileName = `auto-${slug}-${hash}.png`;
-        const croppedCover = await cropCover(metadata.picture, fileName);
-        writeIfChanged(
-            join(coversDirectory, coverFileName),
-            croppedCover
-        );
-        cover = encodeAssetPath('assets', 'pictures', 'covers', coverFileName);
-    }
-
-    catalog.push({
-        title: metadata.title || fileStem,
-        artist: metadata.artist || null,
-        album: metadata.album || null,
-        file: encodeAssetPath('assets', 'songs', fileName),
-        cover
-    });
-}
-
-const catalogJson = `${JSON.stringify(catalog, null, 2)}\n`;
-const catalogScript = `window.SONG_CATALOG = ${catalogJson.replaceAll('<', '\\u003c')}`;
-
-writeIfChanged(catalogJsonPath, Buffer.from(catalogJson));
-writeIfChanged(catalogScriptPath, Buffer.from(catalogScript));
-
-console.log(`Generated song catalog with ${catalog.length} track(s).`);
-for (const track of catalog) {
-    console.log(`- ${track.title}${track.artist ? ` — ${track.artist}` : ''}`);
+for (const configuration of catalogConfigurations) {
+    await buildSongCatalog(configuration);
 }

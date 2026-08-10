@@ -2,6 +2,10 @@
    ANIMATED LITTLE GARDEN THEME
    ========================================== */
 
+html {
+    background: #a5d6a7;
+}
+
 body.profile-page {
     background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%);
     color: #1f2937;
@@ -17,6 +21,192 @@ body.profile-page {
     position: relative;
     background-image: radial-gradient(circle at top left, rgba(255,255,255,0.25), transparent 35%),
                         radial-gradient(circle at bottom right, rgba(255,255,255,0.18), transparent 30%);
+    animation: pageFadeIn 620ms ease-out both;
+}
+
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.profile-page {
+        animation: none;
+    }
+}
+
+.music-player {
+    --player-green: #2e7d32;
+    --player-green-dark: #174d21;
+    --player-green-light: #a5d6a7;
+    position: sticky;
+    top: 0;
+    z-index: 10000;
+    display: grid;
+    grid-template-columns: minmax(16rem, 1fr) auto minmax(10rem, 14rem) 4rem;
+    align-self: stretch;
+    align-items: center;
+    gap: 2rem;
+    width: calc(100% + 40px);
+    min-height: 5rem;
+    margin: 0 -20px 1.25rem;
+    padding: 0.85rem max(3rem, calc((100% - 1120px) / 2));
+    border-bottom: 1px solid rgba(46, 125, 50, 0.42);
+    box-sizing: border-box;
+    background: rgba(241, 248, 233, 0.94);
+    box-shadow: 0 0.75rem 2.5rem rgba(46, 125, 50, 0.16);
+    backdrop-filter: blur(14px);
+}
+
+.player-heading {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 1rem;
+}
+
+.player-heading > div:last-child {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.player-art {
+    position: relative;
+    display: grid;
+    flex: 0 0 2.6rem;
+    width: 2.6rem;
+    height: 2.6rem;
+    overflow: hidden;
+    place-items: center;
+    border: 1px solid rgba(46, 125, 50, 0.35);
+    border-radius: 50%;
+    background: rgba(165, 214, 167, 0.3);
+    color: var(--player-green);
+    font-size: 1.1rem;
+    box-shadow: inset 0 0 1rem rgba(46, 125, 50, 0.12);
+}
+
+.player-art img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.player-art img[hidden],
+.player-art span[hidden] {
+    display: none;
+}
+
+.player-label {
+    margin: 0 0 0.25rem;
+    color: var(--player-green);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.track-name {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    color: #1f4d2b;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.96rem;
+    white-space: nowrap;
+}
+
+.track-name span {
+    display: inline-block;
+    min-width: max-content;
+    transform: translateX(0);
+}
+
+.player-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.player-controls button {
+    display: grid;
+    width: 2.35rem;
+    height: 2.35rem;
+    padding: 0;
+    border: 1px solid rgba(46, 125, 50, 0.38);
+    border-radius: 50%;
+    place-items: center;
+    background: transparent;
+    color: var(--player-green-dark);
+    cursor: pointer;
+    transition: border-color 180ms ease, background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.player-controls button:hover:not(:disabled),
+.player-controls button:focus-visible {
+    border-color: var(--player-green);
+    background: rgba(165, 214, 167, 0.22);
+    color: #123d1d;
+    transform: translateY(-1px);
+}
+
+.player-controls button:disabled {
+    cursor: wait;
+    opacity: 0.35;
+}
+
+.player-controls .play-button {
+    width: 3rem;
+    height: 3rem;
+    border-color: var(--player-green);
+    background: var(--player-green-dark);
+    color: white;
+    box-shadow: 0 0 1.5rem rgba(46, 125, 50, 0.2);
+}
+
+.volume-control {
+    display: grid;
+    grid-template-columns: 1fr 2.5rem;
+    align-items: center;
+    gap: 0.65rem;
+    color: #4e6b50;
+}
+
+.volume-control input {
+    width: 100%;
+    height: 0.25rem;
+    border-radius: 999px;
+    outline: none;
+    background: #c8e6c9;
+    cursor: pointer;
+    accent-color: var(--player-green);
+}
+
+.volume-control input:focus-visible {
+    outline: 1px solid var(--player-green);
+    outline-offset: 4px;
+}
+
+.volume-control output {
+    color: #4e6b50;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.72rem;
+    text-align: right;
+}
+
+.track-count {
+    margin: 0;
+    color: #5f7d62;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.75rem;
+    text-align: right;
 }
 
 /* Floating Garden Background Elements */
