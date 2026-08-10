@@ -116,7 +116,7 @@ function renderReceivedBox(latestEvent) {
   box.textContent = `🤗 You got a hug ${formatReceivedTime(latestEvent.sentAt)}`;
   box.classList.add("has-hug");
 
-  // Reset timer so it hides cleanly after 5 seconds
+  // Reset timer so it hides cleanly after 10 seconds
   if (hideTimeout) clearTimeout(hideTimeout);
   hideTimeout = setTimeout(() => {
     box.textContent = "No hugs received yet";
@@ -173,8 +173,6 @@ async function sendHug() {
     to: PARTNER_ID,
     sentAt: now
   });
-
-  // Note: Removed renderReceivedBox here so your own screen doesn't trigger your own notification box!
 
   return true;
 }
