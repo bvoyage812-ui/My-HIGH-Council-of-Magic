@@ -1,7 +1,3 @@
-// --- FIREBASE & CANVAS SYNC SYSTEM ---
-import { db } from "./firebase-init.js";
-import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
 const container = document.querySelector('.drawing-box');
 const canvas = document.getElementById('draw-canvas');
 const ctx = canvas.getContext('2d');
@@ -14,126 +10,114 @@ let lastY = 0;
 let history = []; 
 let currentLineWidth = 3; 
 
-// Determine role (partner_a or partner_b) from window.HUG_ROLE set in HTML
-const MY_ID = window.HUG_ROLE || "partner_a";
-const canvasDocRef = doc(db, "drawings", "sharedCanvas");
+// Initialize brush style
+ctx.strokeStyle = '#2e7d32'; 
+ctx.lineCap = 'round';      
+ctx.lineJoin = 'round';
+ctx.lineWidth = currentLineWidth;
 
-brushSlider.addEventListener('input', (e) => {
-    currentLineWidth = e.target.value;
-    brushSizeVal.textContent = currentLineWidth + 'px';
-    ctx.lineWidth = currentLineWidth;
-});
+if (brushSlider && brushSizeVal) {
+    brushSlider.addEventListener('input', (e) => {
+        currentLineWidth = e.target.value;
+        brushSizeVal.textContent = currentLineWidth + 'px';
+        ctx.lineWidth = currentLineWidth;
+    });
+}
 
-function resizeCanvas() {
-    const rect = container.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-
-    // If canvas already has a size, save current drawing to an image buffer so it doesn't stretch
-    let tempCanvas = document.createElement('canvas');
-    let tempCtx = tempCanvas.getContext('2d');
-    if (canvas.width > 0 && canvas.height > 0) {
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = canvas.height;
-        tempCtx.drawImage(canvas, 0, 0);
+function saveState() {
+    const dataURL = canvas.toDataURL();
+    if (history[history.length - 1] !== dataURL) {
+        history.push(dataURL);
     }
-
-    // Set new canvas resolution to match container exactly
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-
-    // Reapply drawing styles
-    ctx.strokeStyle = '#2e7d32'; 
-    ctx.lineWidth = currentLineWidth; 
-    ctx.lineCap = 'round';      
-    ctx.lineJoin = 'round';
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw the old content back without stretching or warping proportions
-    if (tempCanvas.width > 0 && tempCanvas.height > 0) {
-        ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
-    } else {
-        const saved = localStorage.getItem('userDoodle');
-        if (saved) {
-            let savedImg = new Image();
-            savedImg.src = saved;
-            savedImg.onload = () => {
-                ctx.drawImage(savedImg, 0, 0);
-            };
-        }
+    // Save both the drawing and the current container dimensions
+    localStorage.setItem('userDoodle', dataURL);
+    if (container.style.width) {
+        localStorage.setItem('doodleWidth', container.style.width);
+        localStorage.setItem('doodleHeight', container.style.height);
     }
 }
 
+// Dynamically match canvas buffer to container size to prevent stretching and handle resets
+function resizeCanvas() {
+    const rect = container ? container.getBoundingClientRect() : { width: 400, height: 300 };
+    if (rect.width === 0 || rect.height === 0) return;
+
+    // Grab saved drawing before resize wipes the canvas buffer
+    const saved = localStorage.getItem('userDoodle');
+
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    
+    ctx.strokeStyle = '#2e7d32'; 
+    ctx.lineWidth = currentLineWidth;      
+    ctx.lineCap = 'round';      
+    ctx.lineJoin = 'round';
+
+    // Restore drawing instantly so it doesn't disappear when resetting size
+    if (saved) {
+        let savedImg = new Image();
+        savedImg.src = saved;
+        savedImg.onload = () => {
+            ctx.drawImage(savedImg, 0, 0);
+        };
+    }
+
+    // Save the dimensions when manually resized
+    if (container.style.width) {
+        localStorage.setItem('doodleWidth', container.style.width);
+        localStorage.setItem('doodleHeight', container.style.height);
+    }
+}
+
+// Automatically handle manual box resizing and resets
 let resizeTimer;
 const resizeObserver = new ResizeObserver(() => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(resizeCanvas, 50);
+    resizeTimer = setTimeout(resizeCanvas, 30);
 });
-resizeObserver.observe(container);
+if (container) {
+    resizeObserver.observe(container);
+}
 
-// --- REAL-TIME FIREBASE SYNC LISTENER ---
-onSnapshot(canvasDocRef, (snap) => {
-    if (snap.exists()) {
-        const data = snap.data();
-        if (data.sender !== MY_ID && data.imageURL) {
-            let partnerImg = new Image();
-            partnerImg.src = data.imageURL;
-            partnerImg.onload = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(partnerImg, 0, 0);
-                localStorage.setItem('userDoodle', data.imageURL);
-            };
-        } else if (data.sender !== MY_ID && !data.imageURL) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            localStorage.removeItem('userDoodle');
-        }
-    }
-});
-
+// Load saved doodle and custom box size on startup / page reload
 window.addEventListener('load', () => {
+    // Restore saved custom size if it exists
+    const savedWidth = localStorage.getItem('doodleWidth');
+    const savedHeight = localStorage.getItem('doodleHeight');
+    if (savedWidth && savedHeight) {
+        container.style.width = savedWidth;
+        container.style.height = savedHeight;
+    }
+
+    const rect = container ? container.getBoundingClientRect() : { width: 400, height: 300 };
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    ctx.strokeStyle = '#2e7d32'; 
+    ctx.lineWidth = currentLineWidth;          
+    ctx.lineCap = 'round';      
+    ctx.lineJoin = 'round';
+
     const saved = localStorage.getItem('userDoodle');
     if (saved) {
         let img = new Image();
         img.src = saved;
         img.onload = () => {
-            const rect = container.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-            ctx.strokeStyle = '#2e7d32'; 
-            ctx.lineWidth = currentLineWidth;         
-            ctx.lineCap = 'round';      
-            ctx.lineJoin = 'round';
             ctx.drawImage(img, 0, 0);
-            history.push(saved);
+            if (!history.includes(saved)) {
+                history.push(saved);
+            }
         };
-    } else {
-        resizeCanvas();
     }
 });
 
-function saveState() {
-    const dataURL = canvas.toDataURL();
-    history.push(dataURL);
-    localStorage.setItem('userDoodle', dataURL);
-
-    setDoc(canvasDocRef, {
-        sender: MY_ID,
-        imageURL: dataURL,
-        updatedAt: Date.now()
-    }, { merge: true });
-}
-
 function getPosition(e) {
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-
     const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
     const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
 
     return [
-        (clientX - rect.left) * scaleX,
-        (clientY - rect.top) * scaleY
+        clientX - rect.left,
+        clientY - rect.top
     ];
 }
 
@@ -144,6 +128,8 @@ function startDrawing(e) {
 
 function draw(e) {
     if (!isDrawing) return;
+    
+    // Only prevent default behavior when actively drawing strokes with the mouse pressed down
     e.preventDefault(); 
 
     const [currentX, currentY] = getPosition(e);
@@ -162,50 +148,48 @@ function stopDrawing() {
     saveState(); 
 }
 
-canvas.addEventListener('mousedown', startDrawing);
-canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('mouseup', stopDrawing);
-canvas.addEventListener('mouseleave', () => { if (isDrawing) stopDrawing(); });
+if (canvas) {
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', () => { if (isDrawing) stopDrawing(); });
 
-canvas.addEventListener('touchstart', startDrawing);
-canvas.addEventListener('touchmove', draw);
-canvas.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('touchstart', startDrawing);
+    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('touchend', stopDrawing);
+}
 
-document.getElementById('undo-canvas').addEventListener('click', () => {
-    if (history.length > 1) {
-        history.pop(); 
-        let img = new Image();
-        img.src = history[history.length - 1];
-        img.onload = () => {
+const undoBtn = document.getElementById('undo-canvas');
+if (undoBtn) {
+    undoBtn.addEventListener('click', () => {
+        if (history.length > 1) {
+            history.pop(); 
+            let img = new Image();
+            img.src = history[history.length - 1];
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                localStorage.setItem('userDoodle', history[history.length - 1]);
+            };
+        } else if (history.length === 1) {
+            history.pop();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
-            const newURL = history[history.length - 1];
-            localStorage.setItem('userDoodle', newURL);
-            
-            setDoc(canvasDocRef, { sender: MY_ID, imageURL: newURL, updatedAt: Date.now() }, { merge: true });
-        };
-    } else if (history.length === 1) {
-        history.pop();
+            localStorage.removeItem('userDoodle');
+        }
+    });
+}
+
+const clearBtn = document.getElementById('clear-canvas');
+if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        history = []; 
         localStorage.removeItem('userDoodle');
-        
-        setDoc(canvasDocRef, { sender: MY_ID, imageURL: "", updatedAt: Date.now() }, { merge: true });
-    }
-});
+        localStorage.removeItem('doodleWidth');
+        localStorage.removeItem('doodleHeight');
+    });
+}
 
-document.getElementById('clear-canvas').addEventListener('click', () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    history = []; 
-    localStorage.removeItem('userDoodle');
-
-    setDoc(canvasDocRef, {
-        sender: MY_ID,
-        imageURL: "",
-        updatedAt: Date.now()
-    }, { merge: true });
-});
-
-// --- STICKER DRAGGING SYSTEM ---
 function setupStickerDragging() {
     const stickers = document.querySelectorAll('.sticker');
     
@@ -270,19 +254,6 @@ if (document.readyState === 'loading') {
     setupStickerDragging();
 }
 
-// --- HUG BUTTON SYSTEM ---
-var hugBtn = document.getElementById('hug-btn');
-var hugCountEl = document.getElementById('hug-count');
-var hugCount = 0;
-
-if (hugBtn && hugCountEl) {
-    hugBtn.addEventListener('click', () => {
-        hugCount++;
-        hugCountEl.textContent = hugCount;
-        launchHug(hugBtn);
-    });
-}
-
 function launchHug(btn) {
     const rect = btn.getBoundingClientRect();
     const startX = rect.left + rect.width / 2;
@@ -311,25 +282,24 @@ function launchHug(btn) {
 
     setTimeout(() => {
         hug.style.zIndex = '10001';
-    }, 280);
+    }, 280); 
 
     hug.addEventListener('animationend', () => hug.remove());
 }
 
-function clickedBox(element) {}
+function clickedBox(element) {} 
 
 function toggleBox(boxElement) {
     boxElement.classList.toggle('expanded');
 }
 
-// --- TEXT WORD WRAPPER EFFECT ---
 document.addEventListener("DOMContentLoaded", () => {
-    const targets = document.querySelectorAll('.partner-box h3, .partner-content p, .partner-content li');
+    const targets = document.querySelectorAll('.partner-box h3, .partner-content, .partner-content p, .partner-content li');
     
     targets.forEach(el => {
         function wrapWords(node) {
             if (node.nodeType === Node.TEXT_NODE) {
-                const words = node.textContent.split(/(\s+)/);
+                const words = node.textContent.split(/(\s+)/); 
                 const fragment = document.createDocumentFragment();
                 
                 words.forEach(word => {
@@ -346,12 +316,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 node.childNodes.forEach(child => wrapWords(child));
             }
         }
+        
         el.childNodes.forEach(child => wrapWords(child));
     });
 });
 
-// --- PROFILE PHOTO PULSE & EXPAND ---
 window.addEventListener('DOMContentLoaded', (event) => {
+    var audio = document.getElementById('bg-music');
+    if(audio) audio.volume = 0.1;
+
     var frame = document.querySelector('.profile-photo-frame');
     var overlay = document.querySelector('.magic-pulse-overlay');
 
@@ -387,3 +360,25 @@ window.addEventListener('DOMContentLoaded', (event) => {
         });
     });
 });
+
+function launchIncomingHug() {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const startX = window.innerWidth + 120; // starts just off the right edge
+    const startY = centerY;
+
+    const hug = document.createElement('div');
+    hug.className = 'flying-hug-incoming';
+    hug.innerHTML = `
+        <svg viewBox="0 0 32 29" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 29 C16 29 0 18.5 0 8.8 C0 3.4 4 0 8.3 0 C11.4 0 14 1.7 16 4.6 C18 1.7 20.6 0 23.7 0 C28 0 32 3.4 32 8.8 C32 18.5 16 29 16 29 Z" fill="#be0b0b"/>
+        </svg>
+    `;
+    hug.style.left = startX + 'px';
+    hug.style.top = startY + 'px';
+    hug.style.setProperty('--center-x', (centerX - startX) + 'px');
+    hug.style.setProperty('--center-y', (centerY - startY) + 'px');
+
+    document.body.appendChild(hug);
+    hug.addEventListener('animationend', () => hug.remove());
+}
