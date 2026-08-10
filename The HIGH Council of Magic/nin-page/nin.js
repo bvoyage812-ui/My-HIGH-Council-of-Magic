@@ -24,46 +24,44 @@ brushSlider.addEventListener('input', (e) => {
     ctx.lineWidth = currentLineWidth;
 });
 
-function getCanvasImage(callback) {
-    const dataURL = canvas.toDataURL();
-    if (canvas.width === 0 || canvas.height === 0) {
-        callback(null);
-        return;
-    }
-    let img = new Image();
-    img.src = dataURL;
-    img.onload = () => callback(img);
-    img.onerror = () => callback(null);
-}
-
 function resizeCanvas() {
-    getCanvasImage((oldImg) => {
-        const rect = container.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return;
+    const rect = container.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
 
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        
-        ctx.strokeStyle = '#2e7d32'; // Garden dark-green ink tint
-        ctx.lineWidth = currentLineWidth; 
-        ctx.lineCap = 'round';      
-        ctx.lineJoin = 'round';
+    // If canvas already has a size, save current drawing to an image buffer so it doesn't stretch
+    let tempCanvas = document.createElement('canvas');
+    let tempCtx = tempCanvas.getContext('2d');
+    if (canvas.width > 0 && canvas.height > 0) {
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        tempCtx.drawImage(canvas, 0, 0);
+    }
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        if (oldImg && oldImg.width > 0) {
-            ctx.drawImage(oldImg, 0, 0, oldImg.width, oldImg.height, 0, 0, canvas.width, canvas.height);
-        } else {
-            const saved = localStorage.getItem('userDoodle');
-            if (saved) {
-                let savedImg = new Image();
-                savedImg.src = saved;
-                savedImg.onload = () => {
-                    ctx.drawImage(savedImg, 0, 0, canvas.width, canvas.height);
-                };
-            }
+    // Set new canvas resolution to match container exactly
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    // Reapply drawing styles
+    ctx.strokeStyle = '#2e7d32'; 
+    ctx.lineWidth = currentLineWidth; 
+    ctx.lineCap = 'round';      
+    ctx.lineJoin = 'round';
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the old content back without stretching or warping proportions
+    if (tempCanvas.width > 0 && tempCanvas.height > 0) {
+        ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
+    } else {
+        const saved = localStorage.getItem('userDoodle');
+        if (saved) {
+            let savedImg = new Image();
+            savedImg.src = saved;
+            savedImg.onload = () => {
+                ctx.drawImage(savedImg, 0, 0);
+            };
         }
-    });
+    }
 }
 
 let resizeTimer;
@@ -77,17 +75,15 @@ resizeObserver.observe(container);
 onSnapshot(canvasDocRef, (snap) => {
     if (snap.exists()) {
         const data = snap.data();
-        // If the update came from the other partner, load it onto our canvas automatically!
         if (data.sender !== MY_ID && data.imageURL) {
             let partnerImg = new Image();
             partnerImg.src = data.imageURL;
             partnerImg.onload = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(partnerImg, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(partnerImg, 0, 0);
                 localStorage.setItem('userDoodle', data.imageURL);
             };
         } else if (data.sender !== MY_ID && !data.imageURL) {
-            // Partner cleared the canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             localStorage.removeItem('userDoodle');
         }
@@ -107,7 +103,7 @@ window.addEventListener('load', () => {
             ctx.lineWidth = currentLineWidth;         
             ctx.lineCap = 'round';      
             ctx.lineJoin = 'round';
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
             history.push(saved);
         };
     } else {
@@ -120,7 +116,6 @@ function saveState() {
     history.push(dataURL);
     localStorage.setItem('userDoodle', dataURL);
 
-    // Push update to Firebase so partner can see it instantly
     setDoc(canvasDocRef, {
         sender: MY_ID,
         imageURL: dataURL,
@@ -183,11 +178,10 @@ document.getElementById('undo-canvas').addEventListener('click', () => {
         img.src = history[history.length - 1];
         img.onload = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
             const newURL = history[history.length - 1];
             localStorage.setItem('userDoodle', newURL);
             
-            // Sync undo state to Firebase
             setDoc(canvasDocRef, { sender: MY_ID, imageURL: newURL, updatedAt: Date.now() }, { merge: true });
         };
     } else if (history.length === 1) {
@@ -195,7 +189,6 @@ document.getElementById('undo-canvas').addEventListener('click', () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         localStorage.removeItem('userDoodle');
         
-        // Sync clear/undo-all state to Firebase
         setDoc(canvasDocRef, { sender: MY_ID, imageURL: "", updatedAt: Date.now() }, { merge: true });
     }
 });
@@ -205,7 +198,6 @@ document.getElementById('clear-canvas').addEventListener('click', () => {
     history = []; 
     localStorage.removeItem('userDoodle');
 
-    // Sync clear state to Firebase so partner's canvas clears too
     setDoc(canvasDocRef, {
         sender: MY_ID,
         imageURL: "",
