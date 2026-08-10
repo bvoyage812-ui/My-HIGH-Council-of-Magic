@@ -1,5 +1,5 @@
 // hug-system.js
-import { db, messaging, VAPID_KEY } from "../firebase-init.js";
+import { db, messaging, VAPID_KEY } from "./firebase-init.js";
 import {
   doc, getDoc, setDoc, updateDoc, onSnapshot, increment,
   collection, query, where

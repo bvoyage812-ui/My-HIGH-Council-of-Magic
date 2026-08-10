@@ -282,9 +282,18 @@ body.profile-page::after {
 /* ==========================================
    ADJUSTABLE DRAWING NOTE STYLES
    ========================================== */
+.drawing-scroll-container {
+    max-height: 450px; /* Adjust this height based on your layout */
+    overflow-y: auto;  /* Adds a clean vertical scrollbar on the side */
+    overflow-x: hidden;
+    padding: 10px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 650px;
+}
 
 .drawing-section {
-    margin-top: 30px;
+    margin-top: 10px;
     text-align: center;
 }
 
@@ -292,8 +301,8 @@ body.profile-page::after {
     position: relative;
     width: 100%;
     max-width: 600px;
-    height: 300px;             
-    min-width: 280px;           
+    height: 300px;            
+    min-width: 280px;          
     min-height: 150px;
     margin: 0 auto;
     background-color: #ffffff; 
@@ -302,7 +311,6 @@ body.profile-page::after {
     cursor: crosshair;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
     
-    /* MAKES IT ADJUSTABLE DIRECTLY ON THE WEB PAGE */
     resize: both;
     overflow: hidden; 
 }
@@ -312,8 +320,8 @@ body.profile-page::after {
     height: 100%;
     display: block;
     border-radius: 13px;
+    touch-action: auto;
 }
-
 /* Sticker Board */
 .sticker-area {
 
