@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Sanctuary | Our Digital Sanctuary</title>
+    
+    <!-- Links back to your main stylesheet in the root folder -->
+    <link rel="stylesheet" href="../css/nin.css">
+</head>
+ 
+<body class="profile-page">
+  <aside class="music-player" aria-label="Music player">
+      <audio id="audio-player" preload="metadata"></audio>
+      <div class="player-heading">
+          <div class="player-art" aria-hidden="true">
+              <img id="cover-art" alt="" hidden>
+              <span id="cover-fallback">&#9835;</span>
+          </div>
+          <div>
+              <p class="player-label">Now playing</p>
+              <p class="track-name" id="track-name">
+                  <span id="track-title-text">Finding songs...</span>
+              </p>
+          </div>
+      </div>
+      <div class="player-controls">
+          <button id="previous-track" type="button" aria-label="Previous song" disabled>&#10094;</button>
+          <button class="play-button" id="toggle-play" type="button" aria-label="Play" disabled>&#9654;</button>
+          <button id="next-track" type="button" aria-label="Next song" disabled>&#10095;</button>
+      </div>
+      <div class="volume-control">
+          <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.05" aria-label="Volume">
+          <output id="volume-value" for="volume-slider">5%</output>
+      </div>
+      <p class="track-count" id="track-count" aria-live="polite"></p>
+  </aside>
+
+  <div class="magic-pulse-overlay" aria-hidden="true"></div>
+  <div class="flower-background" aria-hidden="true">
+    <span class="flower flower1">🌸</span>
+    <span class="flower flower2">🌼</span>
+    <span class="flower flower3">🪻</span>
+    <span class="flower flower4">🌷</span>
+    <span class="flower flower5">🌹</span>
+    <span class="flower flower6">🌻</span>
+    <span class="flower flower7">🪷</span>
+    <span class="flower flower8">🌺</span>
+    <span class="flower flower9">🌼</span>
+    <span class="flower flower10">💮</span>
+    <span class="flower flower11">💐</span>
+    <span class="flower flower12">🏵️</span>
+  </div>
+  <!-- Sticker Board Section -->
+                <div class="section-title">WELCOME!</div>
+                <div class="sticker-board">
+                    <div class="sticker-area" id="sticker-area">
+                        <img src="assets/pictures/heart.png" class="sticker" alt="Sticker">
+                    </div>
+                </div>
+    <!-- Outer Wrapper for Side Polaroids and Main Card -->
+    <div class="page-wrapper">
+        
+        <!-- Horizontal Row locking everything side-by-side -->
+        <div class="profile-layout-row">
+ 
+            <!-- ========================================== -->
+            <!-- 1. LEFT SIDE POLAROID                      -->
+            <!-- ========================================== -->
+            <div class="polaroid-stack tilt-left">
+                <div class="polaroid-card" data-preview-src="assets/pictures/1st-date.jpg" data-preview-alt="Memory 1">
+                    <img src="assets/pictures/1st-date.jpg" alt="Memory 1" class="polaroid-img">
+                    <p class="polaroid-caption">First Date</p>
+                </div>
+                <div class="mini-photo-slot">
+                    <img src="assets/pictures/bigotto.jpg" alt="Add photo" class="mini-photo-img">
+                </div>
+                <div class="mini-photo-slot">
+                    <img src="assets/pictures/Screenshot 2026-07-27 020403.png" alt="Add photo" class="mini-photo-img">
+                </div>
+            </div>
+ 
+            <!-- ========================================== -->
+            <!-- 2. MAIN PROFILE CONTAINER                  -->
+            <!-- ========================================== -->
+            <div class="profile-container">
+ 
+                <!-- Navigation Header -->
+                <div class="profile-nav">
+                    <a href="../index.html" class="nav-link">Back Home</a>
+                    <span>MY CORNER</span>
+                    <a href="gamer-den.html" class="nav-link">Bridge</a>
+                </div>
+ 
+                <!-- Profile Main Content -->
+                <div class="profile-photo-frame" tabindex="0" role="button" aria-label="Trigger magical profile pulse">
+                    <img src="assets/pictures/me.png" alt="Profile Picture" class="profile-img">
+                </div>
+                <h1>Churrita, Tu Hermosa Novia</h1>
+                <p class="profile-tagline">"We are not perfect, but we are enough. Love yourself just the way you are :&gt;"</p>
+                
+                <div class="section-title">A LITTLE ABOUT ME</div>
+                <ul class="personality-list">
+                    <li>I am a great chef who cooks delicious food and bakes as well </li>
+                    <li>I play games as well, mostly the chill ones but any game</li>
+                    <li>I can draw and paint anything that I love</li>
+                    <li>Confident enough to say my english is good</li>
+                    <li>I am very creative and a genius LOL</li>
+                    <li>I have good music taste</li>
+                    <li>I am really geniune with my feelings</li>
+                    <li>I am there for you even if i have nothing to talk about</li>
+                    <li>I love to eat too</li>
+                    <li>I can code a little... I am an IT student afterall</li>
+                    <li>I have ADHD and I love cats and dogs too</li>
+                    <li>Willing to listen to your interests and problems </li>
+                </ul>
+ 
+     <!-- Section: Partner Details Grid -->
+<div class="section-title">WHAT I LOVE ABOUT MY PARTNER</div>
+<div class="partner-grid">
+    
+    <!-- Box 1: Personality -->
+    <div class="partner-box" onclick="toggleBox(this)">
+        <h3>Personality</h3>
+        <div class="partner-content">
+           He is really transparent and honest with me. He is kind, funny, caring, reliable, good listener, great friend, and a great boyfriend.<br>
+           <br>-When i said he is transparent, I mean it when everytime he is busy with something and he there are times where he needs his time as well he would tell me openly about it.
+           <br>-He is honest, There are times where i would ask him about his thoughts about something and he would be open about it and say that he doesn't like it, I like it when he does tell me so i would know.
+           <br>-He would be there for you to accompany you when you play a game, a good friend you could play with.
+           <br>-He is a great boyfriend so far, spending so much time with me and even cheering me up when i feel a little down. THank you again.
+           We do make mistakes and hopefully you won't dwell on it as much cause i am also learning not to with my
+        </div>
+    </div>
+ 
+    <!-- Box 2: Appearance -->
+    <div class="partner-box" onclick="toggleBox(this)">
+        <h3>Appearance</h3>
+        <div class="partner-content">
+            First of all...
+            <li>He is really handsome. He has a great facial features like a shaped nose, charming dark brown eyes, really fluffy hair( I wish i could fluff it ), Thick eyebrows which fits overall structure,
+            a really cool beared and mustache and has pink kissable lips.(AAAAhhhhhh)</li>
+            <li>He is on the taller side and has chubby features that i really love. He also has THICK ass, may i slap em? LOL</li>
+            <li>And... He has a really great smile which shows his adorable and cute side.</li>
+        </div>
+    </div>
+ 
+    <!-- Box 3: Skills & Traits -->
+<div class="partner-box" onclick="toggleBox(this)">
+    <h3><span>Skills</span> <span>&amp;</span> <span>Traits</span></h3>
+    <div class="partner-content">
+        <ul class="cute-list">
+            <li>Can cook</li>
+            <li>Plays games</li>
+            <li>Is really good at playing games too</li>
+            <li>Has great music taste</li>
+            <li>No problem with english</li>
+            <li>Draws really cutely</li>
+            <li>Can sing great</li>
+            <li>Is really funny potential to be a great comedian someday XD</li>
+            <li>Has also good vocal range and should start a channel</li>
+            <li>Has the charms which other would either be attracted to or finds it funny.</li>
+        </ul>
+    </div>
+</div>
+ 
+<!-- Box 4: Memories -->
+<div class="partner-box" onclick="toggleBox(this)">
+    <h3><span>Memories</span></h3>
+    <div class="partner-content">
+        <p>I will mention all of my favorite memories of us together here:</p>
+        <ul class="cute-list">
+            <li>Our first ever interaction in roblox, which was in "Please Donate!" I was strolling around and looking at people who needed donations when i stumbled upon your cool looking avatar and when i read your sign I donated you to meow for robux(which was literally what you said), this was and will be my most favorite because that same day... you were donated 6,000+ robuck just to reach your goal then you meowed 6k times literally rapid fire it. Honestly I am really glad i was there at that time, I don't regret sleeping late at that time.</li>
+            <li>That one minecraft session together late at night just talking about personal stories and comforting each other as well. This was also the same day where you found out I listened to weird shiz. And the same day where you told me about your experiences.</li>
+            <li>Another minecraft session where we were talking about so many things and the hug as well, thank you for that!</li>
+            <li>A fun date but tiring for you cause you had to walk a lot, it will be one of the great memories we can look back to in the future. I stayed up so late and made popcorn just so i could watch you show me around the city views it was really amazing being there to accompany you on your walk. It was also the same day you bought really comfy shoes!</li>
+        </ul>
+    </div>
+</div>
+    <!-- Otto -->
+     <div class="partner-box" onclick="toggleBox(this)">
+        <h3>His really cute dog named Otto</h3>
+        <div class="partner-content">
+            <img src="assets/pictures/otter.png" alt="Otto the German Doggy" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; margin-top: 10px;">
+        </div>
+    </div>
+ 
+</div>
+                <!-- Attached Drawing Note Section -->
+                <div class="section-title">LEAVE A DOODLE NOTE</div>
+                <p style="font-size: 0.85rem; color: #666; margin-bottom: 10px;">Draw something cute for your partner right here!</p>
+                
+                <div class="drawing-section">
+                    <div class="drawing-box">
+                        <canvas id="draw-canvas"></canvas>
+                    </div>
+                    
+                    <!-- Controls Toolbar (Undo, Clear, and Brush Size Slider) -->
+                    <div style="margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                        <div>
+                            <button class="clear-btn" id="undo-canvas" style="background-color: #a2d2ff; margin-right: 5px;">Undo</button>
+                            <button class="clear-btn" id="clear-canvas">Clear Note</button>
+                        </div>
+                        
+                        <!-- Brush Size Controller -->
+                        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #666;">
+                            <label for="brush-size">Pen Size:</label>
+                            <input type="range" id="brush-size" min="1" max="20" value="3" style="accent-color: #637391; cursor: pointer;">
+                            <span id="brush-size-val" style="width: 20px; text-align: left;">3px</span>
+                        </div>
+                    </div>
+                </div>
+ 
+              
+ 
+                <!-- Interactive Click Counter Section -->
+               <div class="section-title">SEND SOME LOVE</div>
+<div style="margin-top: 15px; text-align: center;">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
+        <button id="hug-btn" class="clear-btn" style="font-size: 1rem; padding: 10px 20px; margin: 0; background-color: #3b82f6;">
+            <span id="hug-btn-label">Send a Virtual Hug</span> (<span id="hug-count">0</span>)
+        </button>
+        <div id="hug-received-box" class="hug-received-box">No hugs received yet</div>
+    </div>
+    <div id="hug-streak"></div>
+</div>
+ 
+
+ 
+            </div> <!-- End of .profile-container -->
+ 
+            <!-- ========================================== -->
+            <!-- 3. RIGHT SIDE POLAROID                     -->
+            <!-- ========================================== -->
+            <div class="polaroid-stack tilt-right">
+                <div class="polaroid-card" data-preview-src="assets/pictures/It Takes Two Screenshot 2026.06.25 - 00.18.17.19.png" data-preview-alt="Memory 2">
+                    <img src="assets/pictures/It Takes Two Screenshot 2026.06.25 - 00.18.17.19.png" alt="Memory 2" class="polaroid-img">
+                    <p class="polaroid-caption">Game Night</p>
+                </div>
+                <div class="mini-photo-slot">
+                    <img src="assets/pictures/Minecraft Screenshot 2026.05.21 - 04.14.49.38.png" alt="Add photo" class="mini-photo-img">
+                    <p class="polaroid-caption"></p>
+                </div>
+                <div class="mini-photo-slot">
+                    <img src="assets/pictures/otto.jpg" alt="Add photo" class="mini-photo-img">
+                </div>
+            </div>
+ 
+        </div> <!-- End of .profile-layout-row -->
+ 
+    </div> <!-- End of .page-wrapper -->
+ 
+<script src="assets/songs-data.js"></script>
+<script src="player.js"></script>
+<script src="nin.js"></script>
+<script>window.HUG_ROLE = "partner_a";</script>
+<script type="module" src="../firebase-init.js"></script>
+<script type="module" src="../hug-system.js"></script>
+</body>
+</html>

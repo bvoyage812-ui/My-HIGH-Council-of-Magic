@@ -1,0 +1,54 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    min-height: 100%;
+    background: #59866c;
+}
+
+body {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    overflow: hidden;
+    background: #59866c;
+    color: white;
+    font-family: Georgia, "Times New Roman", serif;
+    animation: bridgeFadeIn 620ms ease-out both;
+}
+
+main {
+    width: min(46rem, calc(100% - 4rem));
+    padding: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(17, 20, 26, 0.34);
+    box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.2);
+    text-align: center;
+    backdrop-filter: blur(12px);
+}
+
+h1 {
+    font-size: clamp(2rem, 5vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1.12;
+    text-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.24);
+}
+
+@keyframes bridgeFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body {
+        animation: none;
+    }
+}

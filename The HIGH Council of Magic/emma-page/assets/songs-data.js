@@ -1,0 +1,16 @@
+window.SONG_CATALOG = [
+  {
+    "title": "Sān-Z, HOYO-MiX - 60% Daily Life Leisure | 的日常·悠闲 (Official Audio) (From: Zenless Zone Zero)",
+    "artist": "NARUMI",
+    "album": "Sān-Z, HOYO-MiX - 60% Daily Life Leisure | 的日常·悠闲 (Official Audio) (From: Zenless Zone Zero)",
+    "file": "assets/songs/60%25%20Daily%20Life%20Leisure%20(From%20Zenless%20Zone%20Zero).mp3",
+    "cover": "assets/pictures/covers/auto-60-daily-life-leisure-from-zenless-zone-zero-8b2d8be0da.png"
+  },
+  {
+    "title": "口の運動",
+    "artist": "DODDODO - Topic",
+    "album": "口の運動",
+    "file": "assets/songs/%E5%8F%A3%E3%81%AE%E9%81%8B%E5%8B%95.mp3",
+    "cover": "assets/pictures/covers/auto-track-2ce98cbb1c.png"
+  }
+]
