@@ -705,3 +705,42 @@ footer span {
         opacity: 0;
     }
 }
+
+/* Incoming Hug Animation — arrives from the right, pops at center */
+.flying-hug-incoming {
+    position: fixed;
+    width: 44px;
+    height: 44px;
+    pointer-events: none;
+    z-index: 10001;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+    animation: hugArrival 1.3s cubic-bezier(0.34, 1.1, 0.64, 1) forwards;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+}
+
+.flying-hug-incoming svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+@keyframes hugArrival {
+    0% {
+        transform: translate(-50%, -50%) scale(0.3);
+        opacity: 0;
+    }
+    55% {
+        transform: translate(calc(-50% + var(--center-x)), calc(-50% + var(--center-y))) scale(1.15);
+        opacity: 1;
+    }
+    72% {
+        transform: translate(calc(-50% + var(--center-x)), calc(-50% + var(--center-y))) scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-50% + var(--center-x)), calc(-50% + var(--center-y))) scale(0);
+        opacity: 0;
+    }
+}
